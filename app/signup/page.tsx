@@ -21,7 +21,7 @@ export default function Page() {
     })
 
     console.log(data, error)
-    router.push('/confirm-email')
+    router.replace('/confirm-email')
   }
 
   return (
