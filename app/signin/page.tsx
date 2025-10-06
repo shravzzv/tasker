@@ -1,29 +1,37 @@
 'use client'
-
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
-export default function Page() {
+export default function SignInPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
   const router = useRouter()
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const res = await fetch('/signin/api', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+      headers: { 'Content-Type': 'application/json' },
     })
 
-    console.log(data, error)
-    router.push('/dashboard')
+    const data = await res.json()
+
+    if (!res.ok) {
+      setErrorMsg(data.error)
+    } else {
+      router.replace('/dashboard')
+    }
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <h1>Sign In</h1>
+
+      {errorMsg && <p>{errorMsg}</p>}
+
       <input
         type='email'
         placeholder='Email'
@@ -31,6 +39,7 @@ export default function Page() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
+
       <input
         type='password'
         placeholder='Password'
@@ -38,6 +47,7 @@ export default function Page() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
+
       <button type='submit'>Sign In</button>
     </form>
   )
