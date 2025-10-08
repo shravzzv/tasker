@@ -96,12 +96,15 @@ export default function Page() {
               Contact
             </a>
           </div>
-          <Link
-            href='/signup'
-            className='ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition'
-          >
-            Signup
-          </Link>
+          <div>
+            <Link href='/signin'>Signin</Link>
+            <Link
+              href='/signup'
+              className='ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition'
+            >
+              Signup
+            </Link>
+          </div>
         </div>
       </nav>
 
