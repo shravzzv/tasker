@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 
 const testimonials = [
   {
@@ -95,12 +96,15 @@ export default function Page() {
               Contact
             </a>
           </div>
-          <a
-            href='#pricing'
-            className='ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition'
-          >
-            Get Started
-          </a>
+          <div>
+            <Link href='/signin'>Signin</Link>
+            <Link
+              href='/signup'
+              className='ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition'
+            >
+              Signup
+            </Link>
+          </div>
         </div>
       </nav>
 
@@ -118,12 +122,12 @@ export default function Page() {
             The ultimate productivity app to manage your tasks, projects, and
             goals—all in one place.
           </p>
-          <a
-            href='#pricing'
+          <Link
+            href='/signup'
             className='inline-block px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold text-lg shadow hover:bg-blue-700 transition'
           >
             Try Tasker Free
-          </a>
+          </Link>
         </div>
         <div className='flex-1 flex justify-center'>
           <Image

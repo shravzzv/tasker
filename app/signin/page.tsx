@@ -18,6 +18,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import Link from 'next/link'
+import GoogleAuthButton from '@/components/google-auth-button'
 
 const formSchema = z.object({
   email: z.email('Please enter a valid email'),
@@ -45,10 +46,7 @@ export default function SignInPage() {
       const res = await fetch('/signin/api', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: values.email,
-          password: values.password,
-        }),
+        body: JSON.stringify(values),
       })
 
       const data = await res.json()
@@ -58,8 +56,8 @@ export default function SignInPage() {
       } else {
         router.replace('/dashboard')
       }
-    } catch (err) {
-      if (err) setErrorMsg('An unexpected error occurred')
+    } catch {
+      setErrorMsg('An unexpected error occurred')
     } finally {
       setLoading(false)
     }
@@ -67,11 +65,9 @@ export default function SignInPage() {
 
   return (
     <div className='max-w-md mx-auto mt-10'>
-      <Form {...form}>
-        <h1 className='text-2xl font-semibold mb-6 text-center'>
-          Welcome Back
-        </h1>
+      <h1 className='text-2xl font-semibold mb-6 text-center'>Welcome Back</h1>
 
+      <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
           <FormField
             control={form.control}
@@ -137,18 +133,32 @@ export default function SignInPage() {
               'Sign In'
             )}
           </Button>
-
-          <p className='text-center text-sm text-muted-foreground'>
-            Don&apos;t have an account?{' '}
-            <Link
-              href='/signup'
-              className='text-primary underline-offset-4 hover:underline'
-            >
-              Sign up
-            </Link>
-          </p>
         </form>
       </Form>
+
+      {/* Divider */}
+      <div className='relative my-8'>
+        <div className='absolute inset-0 flex items-center'>
+          <span className='w-full border-t border-muted-foreground/30'></span>
+        </div>
+        <div className='relative flex justify-center text-xs uppercase'>
+          <span className='bg-background px-2 text-muted-foreground'>
+            or continue with
+          </span>
+        </div>
+      </div>
+
+      <GoogleAuthButton />
+
+      <p className='text-center text-sm text-muted-foreground mt-6'>
+        Don&apos;t have an account?{' '}
+        <Link
+          href='/signup'
+          className='text-primary underline-offset-4 hover:underline'
+        >
+          Sign up
+        </Link>
+      </p>
     </div>
   )
 }

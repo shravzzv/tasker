@@ -18,6 +18,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import Link from 'next/link'
+import GoogleAuthButton from '@/components/google-auth-button'
 
 const formSchema = z
   .object({
@@ -67,8 +68,8 @@ export default function SignUpPage() {
       } else {
         router.replace('/confirm-email')
       }
-    } catch (err) {
-      if (err) setErrorMsg('An unexpected error occurred')
+    } catch {
+      setErrorMsg('An unexpected error occurred')
     } finally {
       setLoading(false)
     }
@@ -76,11 +77,11 @@ export default function SignUpPage() {
 
   return (
     <div className='max-w-md mx-auto mt-10'>
-      <Form {...form}>
-        <h1 className='text-2xl font-semibold mb-6 text-center'>
-          Create an Account
-        </h1>
+      <h1 className='text-2xl font-semibold mb-6 text-center'>
+        Create an Account
+      </h1>
 
+      <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
           <FormField
             control={form.control}
@@ -149,18 +150,33 @@ export default function SignUpPage() {
               'Sign Up'
             )}
           </Button>
-
-          <p className='text-center text-sm text-muted-foreground'>
-            Already have an account?{' '}
-            <Link
-              href='/signin'
-              className='text-primary underline-offset-4 hover:underline'
-            >
-              Sign in
-            </Link>
-          </p>
         </form>
       </Form>
+
+      {/* Divider */}
+      <div className='relative my-8'>
+        <div className='absolute inset-0 flex items-center'>
+          <span className='w-full border-t border-muted-foreground/30'></span>
+        </div>
+        <div className='relative flex justify-center text-xs uppercase'>
+          <span className='bg-background px-2 text-muted-foreground'>
+            or continue with
+          </span>
+        </div>
+      </div>
+
+      {/* Google Button */}
+      <GoogleAuthButton />
+
+      <p className='text-center text-sm text-muted-foreground mt-6'>
+        Already have an account?{' '}
+        <Link
+          href='/signin'
+          className='text-primary underline-offset-4 hover:underline'
+        >
+          Sign in
+        </Link>
+      </p>
     </div>
   )
 }
