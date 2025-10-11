@@ -14,6 +14,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import CreateTodoForm from '@/components/create-todo-form'
+import Image from 'next/image'
+import defaultTodoCoverImage from '@/public/default todo cover image.jpg'
 
 export default function Dashboard() {
   const [todos, setTodos] = useState<TodoInterface[]>([])
@@ -52,6 +54,13 @@ export default function Dashboard() {
 
       {todos.map((todo) => (
         <div key={todo.id}>
+          <Image
+            src={todo.cover_image || defaultTodoCoverImage}
+            alt='cover image'
+            width={100}
+            height={50}
+            className='h-auto w-auto object-cover rounded'
+          />
           <h2>{todo.title}</h2>
           <p>{todo.description}</p>
           <p>

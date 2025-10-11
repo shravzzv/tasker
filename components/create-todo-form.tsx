@@ -29,6 +29,8 @@ import { Calendar } from '@/components/ui/calendar'
 import { ChevronDownIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
+import { upload } from '@/utils/upload'
+import { Spinner } from './ui/spinner'
 
 const formSchema = z.object({
   title: z.string().min(3, 'Title is required'),
@@ -41,6 +43,14 @@ const formSchema = z.object({
   due: z.date().optional(),
   priority: z.enum(['low', 'medium', 'high']),
   status: z.enum(['todo', 'in-progress', 'done']),
+  cover_image: z
+    .any()
+    .optional()
+    .refine(
+      (file) =>
+        !file || (file instanceof File && file.type.startsWith('image/')),
+      'File must be an image'
+    ),
 })
 
 interface TodoFormProps {
@@ -55,6 +65,7 @@ export default function CreateTodoForm({
   const [userId, setUserId] = useState<string>('')
   const [open, setOpen] = useState(false)
   const [time, setTime] = useState('10:30:00')
+  const [loading, setLoading] = useState(false)
   const supabase = createClient()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -65,13 +76,25 @@ export default function CreateTodoForm({
       due: undefined,
       priority: 'medium',
       status: 'todo',
+      cover_image: '',
     },
   })
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setLoading(true)
     if (!userId) {
       toast.error('User not found')
       return
+    }
+
+    let coverImageUrl: string | null = null
+    if (values.cover_image) {
+      try {
+        coverImageUrl = await upload(values.cover_image, userId)
+      } catch (error) {
+        toast.error('Failed to upload image')
+        console.error(error)
+      }
     }
 
     // Merge date and time
@@ -88,11 +111,13 @@ export default function CreateTodoForm({
       priority: values.priority,
       status: values.status,
       user_id: userId,
+      cover_image: coverImageUrl || '',
     }
 
     addTodo(todo)
     toast.success('Todo added successfully')
     form.reset()
+    setLoading(false)
     closeDrawer()
   }
 
@@ -116,7 +141,7 @@ export default function CreateTodoForm({
           name='title'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Title</FormLabel>
+              <FormLabel>Title*</FormLabel>
               <FormControl>
                 <Input placeholder='Todo title' {...field} />
               </FormControl>
@@ -260,8 +285,40 @@ export default function CreateTodoForm({
           )}
         />
 
-        <Button type='submit' className='w-full'>
-          Add Todo
+        <FormField
+          control={form.control}
+          name='cover_image'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Cover Image</FormLabel>
+              <FormControl>
+                <Input
+                  type='file'
+                  accept='image/*'
+                  onChange={(e) => field.onChange(e.target.files?.[0])}
+                />
+              </FormControl>
+              <FormDescription>
+                Upload an optional cover image for your todo.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button
+          type='submit'
+          className='w-full cursor-pointer'
+          disabled={loading}
+        >
+          {loading ? (
+            <>
+              <Spinner />
+              Adding todo
+            </>
+          ) : (
+            'Add Todo'
+          )}
         </Button>
       </form>
     </Form>
