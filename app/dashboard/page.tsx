@@ -14,8 +14,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import CreateTodoForm from '@/components/create-todo-form'
-import Image from 'next/image'
-import defaultTodoCoverImage from '@/public/default todo cover image.jpg'
+import Todo from '@/components/todo'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 export default function Dashboard() {
   const [todos, setTodos] = useState<TodoInterface[]>([])
@@ -50,52 +50,46 @@ export default function Dashboard() {
     <div>
       <SignOutButton />
 
-      <h1>My Todos</h1>
+      <div className='flex flex-wrap justify-between px-6'>
+        <h1 className='text-2xl font-bold mb-4'>My Todos</h1>
 
-      {todos.map((todo) => (
-        <div key={todo.id}>
-          <Image
-            src={todo.cover_image || defaultTodoCoverImage}
-            alt='cover image'
-            width={100}
-            height={50}
-            className='h-auto w-auto object-cover rounded'
-          />
-          <h2>{todo.title}</h2>
-          <p>{todo.description}</p>
-          <p>
-            Due:{' '}
-            {todo.due ? new Date(todo.due).toLocaleTimeString() : 'No due date'}
-          </p>
-        </div>
-      ))}
+        <Drawer
+          direction='right'
+          open={isDrawerOpen}
+          onOpenChange={setIsDrawerOpen}
+        >
+          <DrawerTrigger asChild>
+            <Button>
+              <Plus />
+              Add Todo
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent className='max-h-screen overflow-y-auto'>
+            <DrawerHeader>
+              <DrawerTitle>Create a new Todo</DrawerTitle>
+              <DrawerDescription>
+                Fill out the details below to add a new todo to your list.
+              </DrawerDescription>
+            </DrawerHeader>
+            <ScrollArea>
+              <CreateTodoForm
+                addTodo={createTodo}
+                closeDrawer={() => setIsDrawerOpen(false)}
+              />
+            </ScrollArea>
+          </DrawerContent>
+        </Drawer>
+      </div>
 
-      {todos.length === 0 && <p>No todos found.</p>}
+      <div className='grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6 p-6'>
+        {todos.map((todo) => (
+          <Todo key={todo.id} todo={todo} />
+        ))}
+      </div>
 
-      <Drawer
-        direction='right'
-        open={isDrawerOpen}
-        onOpenChange={setIsDrawerOpen}
-      >
-        <DrawerTrigger asChild>
-          <Button>
-            <Plus />
-            Add Todo
-          </Button>
-        </DrawerTrigger>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>Create a new Todo</DrawerTitle>
-            <DrawerDescription>
-              Fill out the details below to add a new todo to your list.
-            </DrawerDescription>
-          </DrawerHeader>
-          <CreateTodoForm
-            addTodo={createTodo}
-            closeDrawer={() => setIsDrawerOpen(false)}
-          />
-        </DrawerContent>
-      </Drawer>
+      {todos.length === 0 && (
+        <p className='text-muted-foreground'>No todos found.</p>
+      )}
     </div>
   )
 }
