@@ -30,6 +30,12 @@ export default function Dashboard() {
     }
   }
 
+  const deleteTodo = async (id: string) => {
+    const { error } = await supabase.from('todos').delete().eq('id', id)
+    if (error) console.error('Error deleting todo:', error)
+    setTodos((prev) => prev.filter((todo) => todo.id !== id))
+  }
+
   useEffect(() => {
     const fetchTodos = async () => {
       const { data } = await supabase.auth.getUser()
@@ -83,7 +89,7 @@ export default function Dashboard() {
 
       <div className='grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6 p-6'>
         {todos.map((todo) => (
-          <Todo key={todo.id} todo={todo} />
+          <Todo key={todo.id} todo={todo} deleteTodo={deleteTodo} />
         ))}
       </div>
 

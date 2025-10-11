@@ -13,13 +13,16 @@ import Image from 'next/image'
 import defaultTodoCoverImage from '@/public/default todo cover image.jpg'
 import { TodoInterface } from '@/types/todo'
 import { format } from 'date-fns'
-import { Clock, Flag, ListChecks } from 'lucide-react'
+import { Clock, Flag, ListChecks, Pencil, Trash } from 'lucide-react'
+import { Button } from './ui/button'
+import { toast } from 'sonner'
 
 interface TodoProps {
   todo: TodoInterface
+  deleteTodo: (id: string) => void
 }
 
-export default function Todo({ todo }: TodoProps) {
+export default function Todo({ todo, deleteTodo }: TodoProps) {
   const priorityColors = {
     low: 'bg-green-100 text-green-800',
     medium: 'bg-yellow-100 text-yellow-800',
@@ -30,6 +33,18 @@ export default function Todo({ todo }: TodoProps) {
     todo: 'bg-gray-100 text-gray-800',
     'in-progress': 'bg-blue-100 text-blue-800',
     done: 'bg-emerald-100 text-emerald-800',
+  }
+
+  const handleDelete = () => {
+    if (confirm('Are you sure you want to delete this todo?')) {
+      if (todo.id) {
+        deleteTodo(todo.id)
+      } else {
+        alert('Cannot delete: todo id is missing.')
+      }
+    }
+
+    toast.success('Todo deleted successfully.')
   }
 
   return (
@@ -46,9 +61,12 @@ export default function Todo({ todo }: TodoProps) {
 
       <CardHeader>
         <CardTitle className='text-xl font-semibold'>{todo.title}</CardTitle>
+
         {todo.description && (
           <CardDescription className='text-sm text-muted-foreground'>
-            {todo.description}
+            {todo.description.length > 80
+              ? `${todo.description.slice(0, 80)}...`
+              : todo.description}
           </CardDescription>
         )}
       </CardHeader>
@@ -76,9 +94,23 @@ export default function Todo({ todo }: TodoProps) {
         </div>
       </CardContent>
 
-      <CardFooter className='text-xs text-muted-foreground'>
-        Created:{' '}
-        {todo.created_at ? format(new Date(todo.created_at), 'PPpp') : '—'}
+      <CardFooter>
+        <div className='flex gap-2'>
+          <Button variant={'secondary'} size={'sm'} className='cursor-pointer'>
+            <Pencil size={16} />
+            Edit
+          </Button>
+
+          <Button
+            variant={'destructive'}
+            size={'sm'}
+            className='cursor-pointer'
+            onClick={handleDelete}
+          >
+            <Trash size={16} />
+            Delete
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   )

@@ -299,7 +299,8 @@ export default function CreateTodoForm({
                 />
               </FormControl>
               <FormDescription>
-                Upload an optional cover image for your todo.
+                Upload an optional cover image for your todo. Use a landscape
+                image for best results.
               </FormDescription>
               <FormMessage />
             </FormItem>
