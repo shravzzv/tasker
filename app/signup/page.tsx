@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import Link from 'next/link'
 import GoogleAuthButton from '@/components/google-auth-button'
+import GithubAuthButton from '@/components/github-auth-button'
 
 const formSchema = z
   .object({
@@ -165,8 +166,10 @@ export default function SignUpPage() {
         </div>
       </div>
 
-      {/* Google Button */}
-      <GoogleAuthButton />
+      <div className='flex flex-col gap-4'>
+        <GoogleAuthButton />
+        <GithubAuthButton />
+      </div>
 
       <p className='text-center text-sm text-muted-foreground mt-6'>
         Already have an account?{' '}
