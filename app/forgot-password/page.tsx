@@ -59,6 +59,9 @@ export default function ForgotPasswordPage() {
       if (err) setErrorMsg('An unexpected error occurred.')
     } finally {
       setLoading(false)
+      if (captcha.current) {
+        captcha.current.resetCaptcha()
+      }
     }
   }
 
