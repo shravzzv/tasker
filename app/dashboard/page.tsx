@@ -36,6 +36,25 @@ export default function Dashboard() {
     setTodos((prev) => prev.filter((todo) => todo.id !== id))
   }
 
+  const updateTodo = async (
+    id: string,
+    updatedFields: Partial<TodoInterface>
+  ) => {
+    const { data, error } = await supabase
+      .from('todos')
+      .update(updatedFields)
+      .eq('id', id)
+      .select()
+
+    if (error) {
+      console.error('Error updating todo:', error)
+    }
+
+    if (data && data.length > 0) {
+      setTodos((prev) => prev.map((todo) => (todo.id === id ? data[0] : todo)))
+    }
+  }
+
   useEffect(() => {
     const fetchTodos = async () => {
       const { data } = await supabase.auth.getUser()
@@ -89,7 +108,12 @@ export default function Dashboard() {
 
       <div className='grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6 p-6'>
         {todos.map((todo) => (
-          <Todo key={todo.id} todo={todo} deleteTodo={deleteTodo} />
+          <Todo
+            key={todo.id}
+            todo={todo}
+            deleteTodo={deleteTodo}
+            updateTodo={updateTodo}
+          />
         ))}
       </div>
 

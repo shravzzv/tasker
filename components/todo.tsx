@@ -27,13 +27,27 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer'
+import { ScrollArea } from './ui/scroll-area'
+import { useState } from 'react'
+import UpdateTodoForm from './update-todo-form'
 
 interface TodoProps {
   todo: TodoInterface
   deleteTodo: (id: string) => void
+  updateTodo: (id: string, updatedFields: Partial<TodoInterface>) => void
 }
 
-export default function Todo({ todo, deleteTodo }: TodoProps) {
+export default function Todo({ todo, deleteTodo, updateTodo }: TodoProps) {
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false)
+
   const priorityColors = {
     low: 'bg-green-100 text-green-800',
     medium: 'bg-yellow-100 text-yellow-800',
@@ -107,10 +121,41 @@ export default function Todo({ todo, deleteTodo }: TodoProps) {
 
       <CardFooter>
         <div className='flex gap-2'>
-          <Button variant={'secondary'} size={'sm'} className='cursor-pointer'>
-            <Pencil size={16} />
-            Edit
-          </Button>
+          <Drawer
+            direction='right'
+            open={isDrawerOpen}
+            onOpenChange={setIsDrawerOpen}
+          >
+            <DrawerTrigger asChild>
+              <Button
+                variant={'secondary'}
+                size={'sm'}
+                className='cursor-pointer'
+              >
+                <Pencil size={16} />
+                Edit
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent className='max-h-screen overflow-y-auto'>
+              <DrawerHeader>
+                <DrawerTitle>Update a todo</DrawerTitle>
+                <DrawerDescription>
+                  Edit the details below to update a todo in your list.
+                </DrawerDescription>
+              </DrawerHeader>
+              <ScrollArea>
+                <UpdateTodoForm
+                  todo={todo}
+                  updateTodo={(updatedFields) => {
+                    if (todo.id) {
+                      updateTodo(todo.id, updatedFields)
+                    }
+                  }}
+                  closeDrawer={() => setIsDrawerOpen(false)}
+                />
+              </ScrollArea>
+            </DrawerContent>
+          </Drawer>
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
