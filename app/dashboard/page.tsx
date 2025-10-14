@@ -1,4 +1,5 @@
 'use client'
+
 import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import SignOutButton from '@/components/sign-out-button'
@@ -16,10 +17,12 @@ import { Plus } from 'lucide-react'
 import CreateTodoForm from '@/components/create-todo-form'
 import Todo from '@/components/todo'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function Dashboard() {
   const [todos, setTodos] = useState<TodoInterface[]>([])
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false)
+  const [loadingTodos, setLoadingTodos] = useState(true)
   const supabase = createClient()
 
   const createTodo = async (todo: TodoInterface) => {
@@ -57,8 +60,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchTodos = async () => {
+      setLoadingTodos(true)
       const { data } = await supabase.auth.getUser()
-      if (!data?.user) return
+      if (!data?.user) {
+        setLoadingTodos(false)
+        return
+      }
 
       const { data: todosData } = await supabase
         .from('todos')
@@ -66,6 +73,7 @@ export default function Dashboard() {
         .eq('user_id', data.user.id)
 
       setTodos(todosData || [])
+      setLoadingTodos(false)
     }
 
     fetchTodos()
@@ -107,17 +115,32 @@ export default function Dashboard() {
       </div>
 
       <div className='grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6 p-6'>
-        {todos.map((todo) => (
-          <Todo
-            key={todo.id}
-            todo={todo}
-            deleteTodo={deleteTodo}
-            updateTodo={updateTodo}
-          />
-        ))}
+        {loadingTodos
+          ? Array.from({ length: 6 }).map((_, idx) => (
+              <div
+                key={idx}
+                className='overflow-hidden rounded-2xl shadow-md p-4 flex flex-col gap-3'
+              >
+                <Skeleton className='h-40 w-full rounded-md' />
+                <Skeleton className='h-6 w-3/4 rounded-md' />
+                <Skeleton className='h-4 w-1/2 rounded-md' />
+                <div className='flex gap-2'>
+                  <Skeleton className='h-6 w-16 rounded-full' />
+                  <Skeleton className='h-6 w-16 rounded-full' />
+                </div>
+              </div>
+            ))
+          : todos.map((todo) => (
+              <Todo
+                key={todo.id}
+                todo={todo}
+                deleteTodo={deleteTodo}
+                updateTodo={updateTodo}
+              />
+            ))}
       </div>
 
-      {todos.length === 0 && (
+      {!loadingTodos && todos.length === 0 && (
         <p className='text-muted-foreground'>No todos found.</p>
       )}
     </div>
