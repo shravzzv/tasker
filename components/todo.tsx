@@ -16,6 +16,17 @@ import { format } from 'date-fns'
 import { Clock, Flag, ListChecks, Pencil, Trash } from 'lucide-react'
 import { Button } from './ui/button'
 import { toast } from 'sonner'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 
 interface TodoProps {
   todo: TodoInterface
@@ -35,16 +46,16 @@ export default function Todo({ todo, deleteTodo }: TodoProps) {
     done: 'bg-emerald-100 text-emerald-800',
   }
 
-  const handleDelete = () => {
-    if (confirm('Are you sure you want to delete this todo?')) {
-      if (todo.id) {
-        deleteTodo(todo.id)
-      } else {
-        alert('Cannot delete: todo id is missing.')
-      }
-    }
+  const handleDelete = async () => {
+    if (!todo.id) return
 
-    toast.success('Todo deleted successfully.')
+    try {
+      await deleteTodo(todo.id)
+      toast.success('Todo deleted successfully.')
+    } catch (error) {
+      toast.error('Failed to delete todo.')
+      console.error(error)
+    }
   }
 
   return (
@@ -101,15 +112,38 @@ export default function Todo({ todo, deleteTodo }: TodoProps) {
             Edit
           </Button>
 
-          <Button
-            variant={'destructive'}
-            size={'sm'}
-            className='cursor-pointer'
-            onClick={handleDelete}
-          >
-            <Trash size={16} />
-            Delete
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant={'destructive'}
+                size={'sm'}
+                className='cursor-pointer'
+              >
+                <Trash size={16} />
+                Delete
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete this todo?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. It will permanently delete this
+                  todo from your list.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className='cursor-pointer'>
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  className='cursor-pointer bg-destructive text-white hover:bg-destructive/90'
+                >
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </CardFooter>
     </Card>
