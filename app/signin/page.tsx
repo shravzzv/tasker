@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -20,6 +20,7 @@ import { Spinner } from '@/components/ui/spinner'
 import Link from 'next/link'
 import GoogleAuthButton from '@/components/google-auth-button'
 import GithubAuthButton from '@/components/github-auth-button'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 
 const formSchema = z.object({
   email: z.email('Please enter a valid email'),
@@ -29,7 +30,10 @@ const formSchema = z.object({
 export default function SignInPage() {
   const router = useRouter()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [captchaToken, setCaptchaToken] = useState<string | undefined>()
+
+  const captcha = useRef<HCaptcha>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,7 +51,11 @@ export default function SignInPage() {
       const res = await fetch('/signin/api', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+          captchaToken,
+        }),
       })
 
       const data = await res.json()
@@ -61,6 +69,9 @@ export default function SignInPage() {
       setErrorMsg('An unexpected error occurred')
     } finally {
       setLoading(false)
+      if (captcha.current) {
+        captcha.current.resetCaptcha()
+      }
     }
   }
 
@@ -124,7 +135,19 @@ export default function SignInPage() {
 
           {errorMsg && <p className='text-red-500 text-sm'>{errorMsg}</p>}
 
-          <Button type='submit' className='w-full' disabled={loading}>
+          <HCaptcha
+            ref={captcha}
+            sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+            onVerify={(token) => {
+              setCaptchaToken(token)
+            }}
+          />
+
+          <Button
+            type='submit'
+            className='w-full'
+            disabled={loading || !captchaToken}
+          >
             {loading ? (
               <>
                 <Spinner />

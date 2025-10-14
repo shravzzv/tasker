@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -17,6 +17,7 @@ import {
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 import { Spinner } from '@/components/ui/spinner'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 
 const formSchema = z.object({
   email: z.email('Please enter a valid email address'),
@@ -26,6 +27,9 @@ export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
+  const [captchaToken, setCaptchaToken] = useState<string | undefined>()
+
+  const captcha = useRef<HCaptcha>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,7 +45,7 @@ export default function ForgotPasswordPage() {
       const res = await fetch('/forgot-password/api', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: values.email }),
+        body: JSON.stringify({ email: values.email, captchaToken }),
       })
 
       const data = await res.json()
@@ -55,6 +59,9 @@ export default function ForgotPasswordPage() {
       if (err) setErrorMsg('An unexpected error occurred.')
     } finally {
       setLoading(false)
+      if (captcha.current) {
+        captcha.current.resetCaptcha()
+      }
     }
   }
 
@@ -91,7 +98,19 @@ export default function ForgotPasswordPage() {
           {errorMsg && <p className='text-red-500 text-sm'>{errorMsg}</p>}
           {successMsg && <p className='text-green-600 text-sm'>{successMsg}</p>}
 
-          <Button type='submit' className='w-full' disabled={loading}>
+          <HCaptcha
+            ref={captcha}
+            sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+            onVerify={(token) => {
+              setCaptchaToken(token)
+            }}
+          />
+
+          <Button
+            type='submit'
+            className='w-full'
+            disabled={loading || !captchaToken}
+          >
             {loading ? (
               <>
                 <Spinner /> Sending link

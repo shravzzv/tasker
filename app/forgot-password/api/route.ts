@@ -4,10 +4,11 @@ import { createClient } from '@/utils/supabase/server'
 export async function POST(req: Request) {
   try {
     const supabase = await createClient()
-    const { email } = await req.json()
+    const { email, captchaToken } = await req.json()
 
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${process.env.NEXT_PUBLIC_APP_URL_ROOT}/update-password`,
+      captchaToken,
     })
 
     if (error) {
