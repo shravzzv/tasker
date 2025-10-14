@@ -33,6 +33,7 @@ import {
 import { useRouter } from 'next/navigation'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Calendar, Clock, AlertTriangle, ListTodo } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -258,6 +259,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+
+          <Button variant='link' size='sm' className='cursor-pointer' asChild>
+            <Link href='/dashboard'>Back</Link>
+          </Button>
         </div>
       </main>
     </div>
