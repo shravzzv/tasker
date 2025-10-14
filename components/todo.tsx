@@ -38,6 +38,7 @@ import {
 import { ScrollArea } from './ui/scroll-area'
 import { useState } from 'react'
 import UpdateTodoForm from './update-todo-form'
+import Link from 'next/link'
 
 interface TodoProps {
   todo: TodoInterface
@@ -85,13 +86,13 @@ export default function Todo({ todo, deleteTodo, updateTodo }: TodoProps) {
       </div>
 
       <CardHeader>
-        <CardTitle className='text-xl font-semibold'>{todo.title}</CardTitle>
+        <CardTitle className='text-xl font-semibold truncate'>
+          {todo.title}
+        </CardTitle>
 
         {todo.description && (
-          <CardDescription className='text-sm text-muted-foreground'>
-            {todo.description.length > 80
-              ? `${todo.description.slice(0, 80)}...`
-              : todo.description}
+          <CardDescription className='text-sm text-muted-foreground truncate'>
+            {todo.description}
           </CardDescription>
         )}
       </CardHeader>
@@ -189,6 +190,10 @@ export default function Todo({ todo, deleteTodo, updateTodo }: TodoProps) {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+
+          <Button variant='link' size='sm' className='cursor-pointer' asChild>
+            <Link href={`/todo/${todo.id}`}>More</Link>
+          </Button>
         </div>
       </CardFooter>
     </Card>
