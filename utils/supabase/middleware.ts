@@ -31,8 +31,11 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname
 
-  // Protect the dashboard route when the user is unauthenticated
-  if (!user && pathname.startsWith('/dashboard')) {
+  // Protect dashboard and todo pages when unauthenticated
+  if (
+    !user &&
+    (pathname.startsWith('/dashboard') || pathname.startsWith('/todo'))
+  ) {
     const url = request.nextUrl.clone()
     url.pathname = '/signin'
     return NextResponse.redirect(url)
