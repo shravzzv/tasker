@@ -92,7 +92,9 @@ export default function Dashboard() {
 
   return (
     <div>
-      <SignOutButton />
+      <div className='flex justify-end p-6'>
+        <SignOutButton />
+      </div>
 
       <div className='flex flex-wrap justify-between px-6'>
         <h1 className='text-2xl font-bold mb-4'>My Todos</h1>
