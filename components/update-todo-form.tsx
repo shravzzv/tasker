@@ -32,6 +32,7 @@ import { format } from 'date-fns'
 import { upload } from '@/utils/upload'
 import { Spinner } from './ui/spinner'
 import Image from 'next/image'
+import { deleteUploadedImage } from '@/utils/delete-upload'
 
 const formSchema = z.object({
   title: z.string().min(3, 'Title is required'),
@@ -118,6 +119,7 @@ export default function UpdateTodoForm({
     if (values.cover_image && values.cover_image instanceof File) {
       try {
         coverImageUrl = await upload(values.cover_image, userId)
+        if (todo.cover_image) await deleteUploadedImage(todo.cover_image)
       } catch (error) {
         toast.error('Failed to upload new image')
         console.error(error)
