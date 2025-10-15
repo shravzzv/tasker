@@ -18,6 +18,7 @@ import CreateTodoForm from '@/components/create-todo-form'
 import Todo from '@/components/todo'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
+import { deleteUploadedImage } from '@/utils/delete-upload'
 
 export default function Dashboard() {
   const [todos, setTodos] = useState<TodoInterface[]>([])
@@ -34,8 +35,18 @@ export default function Dashboard() {
   }
 
   const deleteTodo = async (id: string) => {
+    const { data } = await supabase
+      .from('todos')
+      .select('cover_image')
+      .eq('id', id)
+      .single()
+
     const { error } = await supabase.from('todos').delete().eq('id', id)
     if (error) console.error('Error deleting todo:', error)
+
+    // delete cover image if present from storage
+    if (data?.cover_image) await deleteUploadedImage(data.cover_image)
+
     setTodos((prev) => prev.filter((todo) => todo.id !== id))
   }
 
