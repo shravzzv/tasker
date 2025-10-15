@@ -34,6 +34,7 @@ import { useRouter } from 'next/navigation'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Calendar, Clock, AlertTriangle, ListTodo } from 'lucide-react'
 import Link from 'next/link'
+import { deleteUploadedImage } from '@/utils/delete-upload'
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -69,11 +70,14 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const deleteTodo = async () => {
     if (!todo?.id) return
     const { error } = await supabase.from('todos').delete().eq('id', todo.id)
+    if (todo.cover_image) deleteUploadedImage(todo.cover_image)
+
     if (error) {
       toast.error('Failed to delete todo.')
     } else {
       toast.success('Todo deleted successfully.')
     }
+
     router.replace('/dashboard')
   }
 
