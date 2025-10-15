@@ -1,12 +1,14 @@
 import { createClient } from '@/utils/supabase/client'
+import { v4 as uuidv4 } from 'uuid'
 
-export async function upload(file: File, userId: string) {
+export async function upload(
+  file: File,
+  userId: string
+): Promise<string | null> {
   if (!file) return null
 
   const supabase = createClient()
-  const fileExt = file.name.split('.').pop()
-  const fileName = `${userId}-${Date.now()}.${fileExt}`
-  const filePath = `${userId}/${fileName}`
+  const filePath = `${userId}/${uuidv4()}`
 
   const { error } = await supabase.storage
     .from('todos_cover_images')
@@ -14,7 +16,6 @@ export async function upload(file: File, userId: string) {
 
   if (error) {
     console.error('Upload error:', error)
-    throw new Error('Failed to upload image')
   }
 
   // Get the public URL

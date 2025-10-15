@@ -57,7 +57,7 @@ export default function UpdatePasswordPage() {
   }
 
   return (
-    <div className='max-w-md mx-auto mt-10'>
+    <div className='max-w-md mx-auto mt-10 px-4'>
       <Form {...form}>
         <h1 className='text-2xl font-semibold mb-6 text-center'>
           Update Password

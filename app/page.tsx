@@ -344,15 +344,20 @@ export default function Page() {
                 GitHub Repo
               </a>
               <a
+                href='https://www.reddit.com/r/tasker_app/'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='hover:text-white transition'
+              >
+                Reddit
+              </a>
+              <a
                 href='https://github.com/shravzzv/tasker/issues'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='hover:text-white transition'
               >
                 Submit Issues
-              </a>
-              <a href='#' className='hover:text-white transition'>
-                Changelog
               </a>
             </div>
             <div className='flex flex-col gap-2'>
