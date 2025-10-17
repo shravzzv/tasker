@@ -1,6 +1,6 @@
 'use client'
 
-import { signInWithGoogle } from '@/utils/actions'
+import { signInWithGoogle } from '@/app/actions'
 import { Button } from './ui/button'
 
 export default function GoogleAuthButton() {

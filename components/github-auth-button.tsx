@@ -1,6 +1,6 @@
 'use client'
 
-import { signInWithGithub } from '@/utils/actions'
+import { signInWithGithub } from '@/app/actions'
 import { Button } from './ui/button'
 
 export default function GithubAuthButton() {
