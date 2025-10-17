@@ -1,68 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
-
-const testimonials = [
-  {
-    name: 'Jane Doe',
-    role: 'Product Manager',
-    quote:
-      "Tasker has completely transformed the way I organize my work. It's intuitive and powerful!",
-    avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-  },
-  {
-    name: 'John Smith',
-    role: 'Freelancer',
-    quote:
-      'I love how easy it is to keep track of my projects. The reminders are a lifesaver!',
-    avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-  },
-  {
-    name: 'Emily Chen',
-    role: 'Developer',
-    quote:
-      "The best productivity app I've used. The UI is beautiful and everything just works.",
-    avatar: 'https://randomuser.me/api/portraits/women/68.jpg',
-  },
-]
-
-const pricing = [
-  {
-    title: 'Free',
-    price: '$0',
-    features: [
-      'Unlimited tasks',
-      'Basic reminders',
-      '1 project',
-      'Community support',
-    ],
-    cta: 'Get Started',
-    highlight: false,
-  },
-  {
-    title: 'Pro',
-    price: '$20/mo',
-    features: [
-      'Unlimited projects',
-      'Advanced reminders',
-      'Collaboration tools',
-      'Priority support',
-    ],
-    cta: 'Upgrade Now',
-    highlight: true,
-  },
-  {
-    title: 'Team',
-    price: '$50/mo',
-    features: [
-      'Team workspaces',
-      'Admin controls',
-      'Integrations',
-      'Dedicated support',
-    ],
-    cta: 'Start Team Trial',
-    highlight: false,
-  },
-]
+import { pricing } from '@/data/pricing'
+import { testimonials } from '@/data/testimonials'
 
 export default function Page() {
   return (
