@@ -90,6 +90,60 @@ export default function Dashboard() {
     fetchTodos()
   }, [supabase])
 
+  useEffect(() => {
+    const userFetchAndSubscribe = async () => {
+      const { data } = await supabase.auth.getUser()
+      if (!data?.user) return
+
+      const userId = data.user.id
+
+      // Subscribe to changes for this user's todos
+      const channel = supabase
+        .channel('public:todos') // channel name can be anything
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'todos',
+            filter: `user_id=eq.${userId}`,
+          },
+          (payload) => {
+            const { eventType, new: newTodoRaw, old: oldTodoRaw } = payload
+            const newTodo = newTodoRaw as TodoInterface
+            const oldTodo = oldTodoRaw as TodoInterface
+
+            setTodos((prev) => {
+              switch (eventType) {
+                case 'INSERT':
+                  if (!prev.find((t) => t.id === newTodo.id)) {
+                    return [newTodo, ...prev]
+                  }
+                  return prev
+                case 'UPDATE':
+                  return prev.map((t) => (t.id === newTodo.id ? newTodo : t))
+                case 'DELETE':
+                  return prev.filter((t) => t.id !== oldTodo.id)
+                default:
+                  return prev
+              }
+            })
+          }
+        )
+        .subscribe()
+
+      // Cleanup: unsubscribe when component unmounts
+      return () => {
+        supabase.removeChannel(channel)
+      }
+    }
+
+    const cleanupPromise = userFetchAndSubscribe()
+    return () => {
+      cleanupPromise.then((cleanup) => cleanup && cleanup())
+    }
+  }, [supabase])
+
   return (
     <div>
       <div className='flex justify-end p-6'>
@@ -154,7 +208,7 @@ export default function Dashboard() {
       </div>
 
       {!loadingTodos && todos.length === 0 && (
-        <p className='text-muted-foreground'>No todos found.</p>
+        <p className='text-muted-foreground px-6'>No todos found.</p>
       )}
     </div>
   )
